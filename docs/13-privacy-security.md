@@ -164,7 +164,7 @@ This application has **no authentication system**. All API routes are open. User
 - User can export all data (Settings → Export Data)
 
 **Right to erasure**:
-- User can delete account (Settings → Delete Account)
+- User can delete cloud data (Settings → Delete All Cloud Data)
 - Cascade delete: all user data removed from Supabase
 - IndexedDB cleared automatically
 
@@ -181,7 +181,7 @@ This application has **no authentication system**. All API routes are open. User
 | Data | Retention |
 |------|-----------|
 | IndexedDB (local) | Until user clears browser data |
-| Supabase (cloud sync) | Until user deletes account |
+| Supabase (cloud sync) | Until user deletes cloud data |
 | API logs (Vercel) | 7 days (Vercel default) |
 | Gemini API logs | Per Google's policy |
 
@@ -256,7 +256,7 @@ This application has **no authentication system**. All API routes are open. User
 │ Data Management:                        │
 │   [Export All Data]                     │
 │   [Clear Local Data]                    │
-│   [Delete Account]                      │
+│   [Delete All Cloud Data]               │
 │                                         │
 │ Privacy Policy: [View]                  │
 │ Terms of Service: [View]                │
