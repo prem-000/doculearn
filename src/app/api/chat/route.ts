@@ -68,9 +68,20 @@ export async function POST(req: NextRequest) {
 
       try {
         const genAI = new GoogleGenerativeAI(key.value);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ 
+          model: 'gemini-2.5-flash',
+          systemInstruction: systemPrompt || 'You are a helpful assistant.'
+        });
 
-        const result = await model.generateContent(prompt);
+        // Use startChat to support history if provided
+        const chat = model.startChat({
+          history: history.map((msg: any) => ({
+            role: msg.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: msg.content }]
+          })),
+        });
+
+        const result = await chat.sendMessage(prompt);
         const response = await result.response;
         const text = response.text();
 

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, BookOpen, Home, ExternalLink } from "lucide-react";
+import { Settings, BookOpen, Home, ExternalLink, Download } from "lucide-react";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -12,6 +13,7 @@ function cn(...inputs: ClassValue[]) {
 
 export function Navbar() {
   const pathname = usePathname();
+  const { install, canInstall, isInstalled } = usePWAInstall();
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
@@ -54,7 +56,17 @@ export function Navbar() {
           })}
         </div>
 
-        <div className="flex items-center ml-6 pl-6 border-l border-white/10">
+        <div className="flex items-center ml-6 pl-6 border-l border-white/10 gap-2">
+          {(!isInstalled && canInstall) && (
+            <button
+              onClick={install}
+              title="Download/Install DocuLearn as a desktop app"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all text-xs font-bold border border-indigo-500/20 shadow-lg shadow-indigo-500/10 animate-pulse-subtle"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download App</span>
+            </button>
+          )}
           <Link 
             href="https://github.com" 
             target="_blank"

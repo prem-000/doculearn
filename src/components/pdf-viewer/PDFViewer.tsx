@@ -12,7 +12,6 @@ interface PDFViewerProps {
 
 export function PDFViewer({ file }: PDFViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [numPages, setNumPages] = useState<number>(0);
   const [pdf, setPdf] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
 
   useEffect(() => {
@@ -21,7 +20,6 @@ export function PDFViewer({ file }: PDFViewerProps) {
       const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
       const loadedPdf = await loadingTask.promise;
       setPdf(loadedPdf);
-      setNumPages(loadedPdf.numPages);
     };
 
     if (file) {
@@ -48,6 +46,7 @@ export function PDFViewer({ file }: PDFViewerProps) {
         const renderContext = {
           canvasContext: context!,
           viewport: viewport,
+          canvas: canvas,
         };
 
         containerRef.current?.appendChild(canvas);

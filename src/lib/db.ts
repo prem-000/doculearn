@@ -162,6 +162,20 @@ export async function getChunksByDoc(doc_id: string) {
   return db.getAllFromIndex('chunks', 'by_doc_id', doc_id);
 }
 
+export async function getChunksByPage(doc_id: string, page_number: number) {
+  const db = await initDB();
+  return db.getAllFromIndex('chunks', 'by_page', [doc_id, page_number]);
+}
+
+export async function getChunksByPageRange(doc_id: string, page_number: number) {
+  const db = await initDB();
+  const pages = [page_number - 1, page_number, page_number + 1].filter(p => p > 0);
+  
+  const chunkPromises = pages.map(p => db.getAllFromIndex('chunks', 'by_page', [doc_id, p]));
+  const results = await Promise.all(chunkPromises);
+  return results.flat();
+}
+
 // Node Graph
 export async function saveNode(node: DocuLearnDB['node_graph']['value']) {
   const db = await initDB();

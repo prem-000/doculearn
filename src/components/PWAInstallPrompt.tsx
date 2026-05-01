@@ -3,42 +3,24 @@
 import { useState, useEffect } from 'react';
 import { Download, X, Monitor, Smartphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 export function PWAInstallPrompt() {
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const { install, canInstall, isInstalled } = usePWAInstall();
   const [isVisible, setIsVisible] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // 1. Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-      return;
-    }
-
-    // 2. Listen for the install prompt
-    const handler = (e: any) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-      // Show prompt after a short delay on first visit
+    if (canInstall && !isInstalled) {
       const hasSeenPrompt = localStorage.getItem('pwa-prompt-seen');
       if (!hasSeenPrompt) {
         setTimeout(() => setIsVisible(true), 3000);
       }
-    };
-
-    window.addEventListener('beforeinstallprompt', handler);
-
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+    }
+  }, [canInstall, isInstalled]);
 
   const handleInstall = async () => {
-    if (!installPrompt) return;
-    
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
+    const success = await install();
+    if (success) {
       setIsVisible(false);
       localStorage.setItem('pwa-prompt-seen', 'true');
     }
@@ -77,7 +59,7 @@ export function PWAInstallPrompt() {
               </div>
               
               <div className="flex-1 space-y-1">
-                <h3 className="font-bold text-lg">Install DocuLearn</h3>
+                <h3 className="font-bold text-lg">Download DocuLearn</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Get the full desktop experience with offline access and PDF file handling.
                 </p>
@@ -89,7 +71,7 @@ export function PWAInstallPrompt() {
                 onClick={handleInstall}
                 className="flex-1 py-3 bg-white text-black rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
               >
-                Install Now
+                Download Now
               </button>
               <div className="flex gap-2 items-center px-3 text-muted-foreground">
                 <Monitor className="w-4 h-4" />

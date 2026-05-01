@@ -11,7 +11,7 @@ export async function getUserSettings(deviceId: string) {
   return data;
 }
 
-export async function updateUserSettings(deviceId: string, settings: any) {
+export async function updateUserSettings(deviceId: string, settings: Record<string, any>) {
   const { data, error } = await supabase
     .from('user_settings')
     .upsert({ user_id: deviceId, ...settings, updated_at: new Date().toISOString() })

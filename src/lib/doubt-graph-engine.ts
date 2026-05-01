@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { DoubtNode, NodeStatus, ConfidenceLevel } from '@/types/doubt-graph';
+import { DoubtNode, ConfidenceLevel } from '@/types/doubt-graph';
 import { saveNode, getNodesByDoc, getNode } from './db';
 
 const MAX_DEPTH = 4;
@@ -43,7 +43,7 @@ export async function createNewNode(
     answer: '',
     confidence_score: 0,
     confidence_level: 'low',
-    model_used: 'gemini-2.0-flash',
+    model_used: 'gemini-2.5-flash',
     tokens_used: 0,
     depth,
     created_at: new Date().toISOString(),
@@ -54,30 +54,49 @@ export async function createNewNode(
   return newNode;
 }
 
-import { searchChunks } from './db';
+import { getChunksByPageRange } from './db';
 
 // Real AI execution with streaming
 export async function* executeAINode(node_id: string, question: string, doc_id: string) {
-  // 1. Retrieve context
-  const chunks = await searchChunks(doc_id, question);
-  const context = chunks.map(c => `[Page ${c.page_number}]: ${c.text}`).join('\n\n');
+  // 1. Get Node to find its page number
+  const node = await getNode(node_id);
+  if (!node) throw new Error("Node not found");
+
+  // 2. Retrieve context (Positional Strategy: N-1, N, N+1)
+  const chunks = await getChunksByPageRange(doc_id, node.page_number);
   
-  // 2. Prepare prompt
-  const systemPrompt = `You are a helpful AI assistant explaining a document. 
-Use the provided context to answer the user's question. 
-If the answer is not in the context, say you don't know based on the document.
-Context:
+  // Also include semantic search results if positional isn't enough? 
+  // User asked for "based on the N+1, N, N-1 pages", so we strictly use those.
+  const context = chunks
+    .sort((a, b) => a.page_number - b.page_number)
+    .map(c => `[Page ${c.page_number}]: ${c.text}`)
+    .join('\n\n');
+  
+  // 3. Prepare prompt
+  const systemPrompt = `You are a strict Document Analysis AI. 
+The user has provided a PDF document (e.g., a Resume or technical doc), and you are analyzing it. 
+Your goal is to answer questions EXCLUSIVELY based on the provided PDF context below.
+
+CRITICAL RULES:
+1. DO NOT ask the user to paste their content or provide the file. YOU ALREADY HAVE IT.
+2. Only use the provided context (Pages ${node.page_number-1} to ${node.page_number+1}).
+3. If the answer is NOT present in the provided context, you MUST say: "I'm sorry, but I cannot find the answer to this question within the specific pages of the document (Pages ${node.page_number-1}-${node.page_number+1})."
+4. Do NOT use outside knowledge or assume things not in the text.
+5. Analyze the text deeply to find subtle connections.
+6. If the context is empty, state that no text was found on these pages.
+
+Context from PDF:
 ${context}`;
 
-  // 3. Call API
+  // 4. Call API
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       prompt: question,
-      deviceId: 'local-user', // In a real app, this would be a real ID
+      deviceId: '00000000-0000-0000-0000-000000000000', 
       systemPrompt,
-      history: [] // Can be populated for multi-turn
+      history: [] 
     })
   });
 

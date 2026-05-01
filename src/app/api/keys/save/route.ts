@@ -6,7 +6,7 @@ const saveSchema = z.object({
   device_id: z.string().uuid(),
   gemini_keys: z.array(z.string().min(10)),
   ollama_url: z.string().url().optional().default("http://localhost:11434"),
-  selected_model: z.string().optional().default("gemini-2.0-flash"),
+  selected_model: z.string().optional().default("gemini-2.5-flash"),
 });
 
 export async function POST(request: Request) {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const validation = saveSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json({ error: "Invalid data", details: validation.error.errors }, { status: 400 });
+      return NextResponse.json({ error: "Invalid data", details: validation.error.issues }, { status: 400 });
     }
 
     const { device_id, gemini_keys, ollama_url, selected_model } = validation.data;

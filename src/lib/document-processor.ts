@@ -1,8 +1,3 @@
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Use the local worker from the public directory to avoid CORS and MIME type issues
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-
 export interface DocumentChunk {
   doc_id: string;
   page_number: number;
@@ -11,6 +6,9 @@ export interface DocumentChunk {
 }
 
 export async function parsePDF(file: File): Promise<string[]> {
+  const pdfjsLib = await import('pdfjs-dist');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+
   const arrayBuffer = await file.arrayBuffer();
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdf = await loadingTask.promise;
@@ -21,7 +19,7 @@ export async function parsePDF(file: File): Promise<string[]> {
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
     const pageText = textContent.items
-      .map((item: any) => item.str)
+      .map((item: any) => (item as { str: string }).str)
       .join(' ');
     pages.push(pageText);
   }

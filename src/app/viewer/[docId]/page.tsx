@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getDocument } from '@/lib/db';
 import { GraphPanel } from '@/components/doubt-graph/GraphPanel';
-import { PDFViewer } from '@/components/pdf-viewer/PDFViewer';
+import dynamic from 'next/dynamic';
+
+const PDFViewer = dynamic(() => import('@/components/pdf-viewer/PDFViewer').then(mod => mod.PDFViewer), { 
+  ssr: false,
+  loading: () => <div className="p-20 text-center text-muted-foreground animate-pulse">Initializing PDF Viewer...</div>
+});
 
 export default function DocumentViewer() {
   const { docId } = useParams() as { docId: string };

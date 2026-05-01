@@ -30,6 +30,7 @@ export const metadata: Metadata = {
 import { DeviceProvider } from "@/components/providers/device-provider";
 import { Toaster } from "react-hot-toast";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { PWARegister } from "@/components/PWARegister";
 
 export default function RootLayout({
   children,
@@ -38,9 +39,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#6366f1" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredPrompt = e;
+          });
+        `}} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <PWARegister />
         <DeviceProvider>
           <Navbar />
           <PWAInstallPrompt />
