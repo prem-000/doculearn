@@ -29,6 +29,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 import { DeviceProvider } from "@/components/providers/device-provider";
@@ -55,13 +59,15 @@ export default function RootLayout({
         `}} />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground h-[100dvh] w-[100dvw] overflow-hidden fixed inset-0`}
       >
         <PWARegister />
         <DeviceProvider>
           <Navbar />
           <PWAInstallPrompt />
-          {children}
+          <main className="w-full h-full pt-14 overflow-hidden relative">
+            {children}
+          </main>
           <Toaster
             position="bottom-right"
             toastOptions={{

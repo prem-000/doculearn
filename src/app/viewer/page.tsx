@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, Brain, Lock, ArrowRight, X } from 'lucide-react';
+import { Upload, FileText, Brain, Lock, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
@@ -21,7 +21,7 @@ export default function ViewerPage() {
     }
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     multiple: false,
     accept: {
@@ -38,10 +38,8 @@ export default function ViewerPage() {
     try {
       const docId = uuidv4();
       
-      // 1. Parse PDF
       const pages = await parsePDF(file);
       
-      // 2. Save Document metadata and file blob
       await saveDocument({
         doc_id: docId,
         name: file.name,
@@ -51,13 +49,11 @@ export default function ViewerPage() {
         indexing_status: 'pending',
         indexing_progress: 0,
         created_at: new Date().toISOString(),
-        file: file // Save the actual blob
+        file: file
       });
 
-      // 3. Chunk text
       const chunks = chunkText(docId, pages);
       
-      // 4. Save chunks to DB
       await saveChunks(chunks.map(c => ({
         chunk_id: uuidv4(),
         ...c,
@@ -68,113 +64,90 @@ export default function ViewerPage() {
         has_image: false
       })));
 
-      // 5. Redirect to viewer
       router.push(`/viewer/${docId}`);
       
     } catch (error) {
       console.error('Processing failed:', error);
-      alert('Failed to process document. Please check the console.');
+      alert('Failed to process document.');
       setIsProcessing(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background selection:bg-indigo-500/30">
+    <div className="flex flex-col h-full w-full relative px-4 overflow-hidden pt-10">
       <AnimatePresence mode="wait">
         {!file ? (
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            key="empty-state"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="max-w-2xl w-full text-center"
+            className="flex flex-col h-full justify-between pb-8"
           >
-            <div className="mb-12 space-y-6">
-              <h1 className="text-5xl font-bold tracking-tight">
-                Unlock your <span className="gradient-text">knowledge.</span>
+            {/* Header Content */}
+            <div className="flex flex-col items-center mt-12 space-y-4 text-center">
+              <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mb-2 shadow-lg shadow-indigo-500/20">
+                <FileText className="w-8 h-8 text-indigo-400" />
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Upload a PDF <br/> <span className="text-muted-foreground">to begin</span>
               </h1>
-              <p className="text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                Drop any document to start your deep-learning journey with AI-powered Doubt Graphs.
+              <p className="text-sm text-muted-foreground max-w-[250px] mx-auto mt-4 leading-relaxed">
+                Tap the button below to select a document from your device.
               </p>
             </div>
 
-            <div 
-              {...getRootProps()} 
-              className={cn(
-                "p-20 border-2 border-dashed rounded-[2.5rem] transition-all cursor-pointer group relative overflow-hidden",
-                isDragActive ? "border-indigo-500 bg-indigo-500/5" : "border-white/10 glass hover:border-indigo-500/30"
-              )}
-            >
-              <input {...getInputProps()} />
-              <div className="flex flex-col items-center gap-8 relative z-10">
-                <div className={cn(
-                  "w-20 h-20 rounded-3xl flex items-center justify-center transition-all duration-500",
-                  isDragActive ? "bg-indigo-500 scale-110 shadow-2xl shadow-indigo-500/50" : "bg-indigo-500/10 group-hover:scale-110"
-                )}>
-                  <Upload className={cn(
-                    "w-10 h-10 transition-colors",
-                    isDragActive ? "text-white" : "text-indigo-400"
-                  )} />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-2xl font-bold">
-                    {isDragActive ? "Drop it here" : "Click or drag document"}
-                  </p>
-                  <p className="text-muted-foreground font-medium">PDF, DOCX, TXT, Markdown</p>
-                </div>
-              </div>
-              
-              {/* Animated Background glow on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            {/* Feature List */}
+            <div className="flex flex-col items-center gap-4 mt-auto mb-10">
+              <SecurityFeature icon={<Lock className="w-4 h-4" />} text="100% Local Processing" />
+              <SecurityFeature icon={<Brain className="w-4 h-4" />} text="AI-Powered Insights" />
             </div>
 
-            <div className="mt-16 flex justify-center gap-12">
-              <SecurityFeature icon={<Lock className="w-5 h-5" />} text="100% Local" />
-              <SecurityFeature icon={<Brain className="w-5 h-5" />} text="AI Chaining" />
-              <SecurityFeature icon={<FileText className="w-5 h-5" />} text="Multi-Format" />
+            {/* FAB Upload Button */}
+            <div className="w-full flex justify-center pb-6">
+              <div {...getRootProps()} className="focus:outline-none">
+                <input {...getInputProps()} />
+                <button className="flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full shadow-2xl shadow-indigo-600/40 active:scale-95 transition-transform">
+                  <Upload className="w-6 h-6 text-white" />
+                </button>
+              </div>
             </div>
           </motion.div>
         ) : (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="max-w-lg w-full p-10 glass rounded-[2.5rem] border border-white/10 text-center space-y-8 relative overflow-hidden"
+            key="file-state"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col h-full items-center justify-center space-y-8"
           >
-            <button 
-              onClick={() => setFile(null)}
-              className="absolute top-6 right-6 p-2 hover:bg-white/5 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5 text-muted-foreground" />
-            </button>
+            <div className="relative w-full max-w-sm p-6 glass rounded-3xl border border-white/10 text-center flex flex-col items-center shadow-2xl shadow-black/40">
+              <button 
+                onClick={() => setFile(null)}
+                className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
 
-            <div className="w-24 h-24 bg-indigo-500/10 rounded-[2rem] mx-auto flex items-center justify-center">
-              <FileText className="w-12 h-12 text-indigo-400" />
-            </div>
-            
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold truncate px-4">{file.name}</h2>
-              <div className="flex items-center justify-center gap-3 text-muted-foreground font-medium">
+              <div className="w-16 h-16 bg-indigo-500/10 rounded-[1.5rem] flex items-center justify-center mb-6">
+                <FileText className="w-8 h-8 text-indigo-400" />
+              </div>
+              
+              <h2 className="text-xl font-bold truncate w-full px-2 mb-2">{file.name}</h2>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium mb-8">
                 <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
                 <span className="w-1 h-1 bg-white/20 rounded-full" />
-                <span className="uppercase text-xs tracking-widest">{file.name.split('.').pop()}</span>
+                <span className="uppercase tracking-wider">{file.name.split('.').pop()}</span>
               </div>
-            </div>
-            
-            <div className="pt-4">
+              
               <button 
                 onClick={startLearning}
                 disabled={isProcessing}
-                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/20 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 group"
+                className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold text-base hover:bg-indigo-500 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center"
               >
                 {isProcessing ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Processing...
-                  </>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <>
-                    Start Learning
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </>
+                  "Start Learning"
                 )}
               </button>
             </div>
@@ -187,9 +160,9 @@ export default function ViewerPage() {
 
 function SecurityFeature({ icon, text }: { icon: React.ReactNode, text: string }) {
   return (
-    <div className="flex items-center gap-3 text-muted-foreground/80 font-medium">
-      <div className="p-2.5 bg-white/5 rounded-xl text-indigo-400/80">{icon}</div>
-      <span className="text-sm tracking-wide">{text}</span>
+    <div className="flex items-center gap-3 text-muted-foreground/80 font-medium bg-white/5 px-4 py-2 rounded-full border border-white/5">
+      <div className="text-indigo-400/80">{icon}</div>
+      <span className="text-xs tracking-wide">{text}</span>
     </div>
   );
 }

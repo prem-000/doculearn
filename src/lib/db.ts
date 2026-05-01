@@ -63,6 +63,7 @@ interface DocuLearnDB extends DBSchema {
       model_used: string;
       tokens_used: number;
       depth: number;
+      hotspot_id?: string;
       created_at: string;
       completed_at: string | null;
     };
@@ -70,6 +71,27 @@ interface DocuLearnDB extends DBSchema {
       'by_doc_id': string;
       'by_parent_id': string;
       'by_page': [string, number];
+    };
+  };
+  hotspots: {
+    key: string;
+    value: {
+      id: string;
+      pdf_id: string;
+      page: number;
+      shape: {
+        type: "circle";
+        cx: number;
+        cy: number;
+        r: number;
+      };
+      text?: string;
+      question?: string;
+      answer?: string;
+      created_at: number;
+    };
+    indexes: {
+      'by_pdf_id': string;
     };
   };
   chat_history: {
@@ -103,33 +125,51 @@ let dbPromise: Promise<IDBPDatabase<DocuLearnDB>>;
 
 export const initDB = () => {
   if (!dbPromise) {
-    dbPromise = openDB<DocuLearnDB>('doculearn_v3', 1, {
+    dbPromise = openDB<DocuLearnDB>('doculearn_v3', 2, {
       upgrade(db) {
         // Documents
-        db.createObjectStore('documents', { keyPath: 'doc_id' });
+        if (!db.objectStoreNames.contains('documents')) {
+          db.createObjectStore('documents', { keyPath: 'doc_id' });
+        }
 
         // Chunks
-        const chunkStore = db.createObjectStore('chunks', { keyPath: 'chunk_id' });
-        chunkStore.createIndex('by_doc_id', 'doc_id');
-        chunkStore.createIndex('by_page', ['doc_id', 'page_number']);
-        chunkStore.createIndex('by_section', ['doc_id', 'section_title']);
+        if (!db.objectStoreNames.contains('chunks')) {
+          const chunkStore = db.createObjectStore('chunks', { keyPath: 'chunk_id' });
+          chunkStore.createIndex('by_doc_id', 'doc_id');
+          chunkStore.createIndex('by_page', ['doc_id', 'page_number']);
+          chunkStore.createIndex('by_section', ['doc_id', 'section_title']);
+        }
 
         // Embeddings
-        const embeddingStore = db.createObjectStore('embeddings', { keyPath: 'chunk_id' });
-        embeddingStore.createIndex('by_doc_id', 'doc_id');
+        if (!db.objectStoreNames.contains('embeddings')) {
+          const embeddingStore = db.createObjectStore('embeddings', { keyPath: 'chunk_id' });
+          embeddingStore.createIndex('by_doc_id', 'doc_id');
+        }
 
         // Node Graph
-        const graphStore = db.createObjectStore('node_graph', { keyPath: 'node_id' });
-        graphStore.createIndex('by_doc_id', 'doc_id');
-        graphStore.createIndex('by_parent_id', 'parent_id');
-        graphStore.createIndex('by_page', ['doc_id', 'page_number']);
+        if (!db.objectStoreNames.contains('node_graph')) {
+          const graphStore = db.createObjectStore('node_graph', { keyPath: 'node_id' });
+          graphStore.createIndex('by_doc_id', 'doc_id');
+          graphStore.createIndex('by_parent_id', 'parent_id');
+          graphStore.createIndex('by_page', ['doc_id', 'page_number']);
+        }
+
+        // Hotspots
+        if (!db.objectStoreNames.contains('hotspots')) {
+          const hotspotStore = db.createObjectStore('hotspots', { keyPath: 'id' });
+          hotspotStore.createIndex('by_pdf_id', 'pdf_id');
+        }
 
         // Chat History
-        db.createObjectStore('chat_history', { keyPath: 'session_id' });
+        if (!db.objectStoreNames.contains('chat_history')) {
+          db.createObjectStore('chat_history', { keyPath: 'session_id' });
+        }
 
         // Memory
-        const memoryStore = db.createObjectStore('memory', { keyPath: 'topic' });
-        memoryStore.createIndex('by_score', 'topic_score');
+        if (!db.objectStoreNames.contains('memory')) {
+          const memoryStore = db.createObjectStore('memory', { keyPath: 'topic' });
+          memoryStore.createIndex('by_score', 'topic_score');
+        }
       },
     });
   }
@@ -190,6 +230,17 @@ export async function getNode(node_id: string) {
 export async function getNodesByDoc(doc_id: string) {
   const db = await initDB();
   return db.getAllFromIndex('node_graph', 'by_doc_id', doc_id);
+}
+
+// Hotspots
+export async function saveHotspot(hotspot: DocuLearnDB['hotspots']['value']) {
+  const db = await initDB();
+  return db.put('hotspots', hotspot);
+}
+
+export async function getHotspotsByDoc(pdf_id: string) {
+  const db = await initDB();
+  return db.getAllFromIndex('hotspots', 'by_pdf_id', pdf_id);
 }
 
 // Search chunks for RAG

@@ -17,6 +17,7 @@ export interface DoubtNode {
   model_used: string;
   tokens_used: number;
   depth: number;
+  hotspot_id?: string;
   created_at: string;
   completed_at: string | null;
 }

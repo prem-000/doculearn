@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, BookOpen, Home, ExternalLink, Download } from "lucide-react";
-import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { Settings, Home, ArrowLeft } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -13,68 +12,46 @@ function cn(...inputs: ClassValue[]) {
 
 export function Navbar() {
   const pathname = usePathname();
-  const { install, canInstall, isInstalled } = usePWAInstall();
 
-  const navItems = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Viewer", href: "/viewer", icon: BookOpen },
-    { name: "Settings", href: "/settings", icon: Settings },
-  ];
+  // Determine if we should show a back button instead of home
+  const isHome = pathname === "/";
+  const showBack = !isHome;
 
   return (
-    <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-center gap-1 px-4 py-2 rounded-2xl glass border border-white/10 shadow-2xl shadow-black/20">
-        <div className="flex items-center gap-6 pr-6 mr-6 border-r border-white/10">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+    <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-background/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-4">
+      {/* Left Action: Home or Back */}
+      <div className="flex items-center">
+        {showBack ? (
+          <Link href="/" className="p-2 -ml-2 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-6 h-6" />
+          </Link>
+        ) : (
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
               D
             </div>
-            <span className="font-bold tracking-tight hidden md:block">DocuLearn</span>
           </Link>
-        </div>
+        )}
+      </div>
 
-        <div className="flex items-center gap-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
-            
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300",
-                  isActive 
-                    ? "bg-white/10 text-foreground" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                )}
-              >
-                <Icon className={cn("w-4 h-4", isActive && "text-indigo-400")} />
-                <span className="text-sm font-medium">{item.name}</span>
-              </Link>
-            );
-          })}
-        </div>
+      {/* Center: Title (Truncated) */}
+      <div className="flex-1 flex justify-center px-4 overflow-hidden">
+        <span className="font-semibold text-sm truncate max-w-full">
+          {isHome ? "DocuLearn AI" : pathname === "/viewer" ? "Document Viewer" : pathname === "/settings" ? "Settings" : "DocuLearn"}
+        </span>
+      </div>
 
-        <div className="flex items-center ml-6 pl-6 border-l border-white/10 gap-2">
-          {(!isInstalled && canInstall) && (
-            <button
-              onClick={install}
-              title="Download/Install DocuLearn as a desktop app"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all text-xs font-bold border border-indigo-500/20 shadow-lg shadow-indigo-500/10 animate-pulse-subtle"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download App</span>
-            </button>
+      {/* Right Action: Settings */}
+      <div className="flex items-center">
+        <Link 
+          href="/settings" 
+          className={cn(
+            "p-2 -mr-2 transition-colors rounded-full",
+            pathname === "/settings" ? "text-indigo-400 bg-white/5" : "text-muted-foreground hover:text-foreground"
           )}
-          <Link 
-            href="https://github.com" 
-            target="_blank"
-            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-all"
-          >
-            <ExternalLink className="w-5 h-5" />
-          </Link>
-        </div>
+        >
+          <Settings className="w-6 h-6" />
+        </Link>
       </div>
     </nav>
   );

@@ -85,142 +85,140 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex flex-col h-full items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white p-6 md:p-12">
-      <div className="max-w-4xl mx-auto">
+    <div className="flex flex-col h-full w-full overflow-y-auto bg-background text-foreground px-4 pb-24 pt-6 relative">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center text-center gap-3 mb-8 mt-4"
+      >
+        <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 shadow-lg shadow-indigo-500/10">
+          <Settings className="w-8 h-8 text-indigo-400" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-[250px] mx-auto">Configure your AI models and privacy preferences</p>
+        </div>
+      </motion.div>
+
+      <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
+        {/* AI Configuration */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-12"
+          transition={{ delay: 0.1 }}
+          className="glass p-5 rounded-3xl border border-white/5"
         >
-          <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
-            <Settings className="w-8 h-8 text-blue-500" />
+          <div className="flex items-center gap-2 mb-4">
+            <Cpu className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg font-bold">AI Models</h2>
           </div>
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight">Settings</h1>
-            <p className="text-gray-400 mt-1">Configure your AI models and privacy preferences</p>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">
+                Gemini API Keys
+              </label>
+              <input
+                type="password"
+                placeholder="AIza..."
+                value={geminiKeys}
+                onChange={(e) => setGeminiKeys(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1">
+                <Shield className="w-3 h-3 text-indigo-400" />
+                Encrypted and never stored in plain text.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">
+                Ollama Base URL
+              </label>
+              <input
+                type="text"
+                placeholder="http://localhost:11434"
+                value={ollamaUrl}
+                onChange={(e) => setOllamaUrl(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">
+                Ollama Model
+              </label>
+              <input
+                type="text"
+                placeholder="llama3:8b"
+                value={ollamaModel}
+                onChange={(e) => setOllamaModel(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+              />
+            </div>
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* AI Configuration */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="glass-card p-8"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <Cpu className="w-5 h-5 text-purple-400" />
-              <h2 className="text-xl font-semibold">AI Models</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Gemini API Keys (Comma separated)
-                </label>
-                <input
-                  type="password"
-                  placeholder="AIza..."
-                  value={geminiKeys}
-                  onChange={(e) => setGeminiKeys(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 transition-colors"
-                />
-                <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                  <Shield className="w-3 h-3" />
-                  Keys are encrypted and never stored in plain text.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Ollama Base URL
-                </label>
-                <input
-                  type="text"
-                  placeholder="http://localhost:11434"
-                  value={ollamaUrl}
-                  onChange={(e) => setOllamaUrl(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Ollama Model
-                </label>
-                <input
-                  type="text"
-                  placeholder="llama3:8b"
-                  value={ollamaModel}
-                  onChange={(e) => setOllamaModel(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 transition-colors"
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Privacy & Cloud */}
-          <div className="space-y-8">
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="glass-card p-8"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <Cloud className="w-5 h-5 text-blue-400" />
-                <h2 className="text-xl font-semibold">Cloud Sync</h2>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10">
-                <div>
-                  <h3 className="font-medium">Enable Cloud Sync</h3>
-                  <p className="text-sm text-gray-400">Sync your Doubt Graph across devices</p>
-                </div>
-                <button
-                  onClick={() => setSyncEnabled(!syncEnabled)}
-                  className={`w-12 h-6 rounded-full transition-colors relative ${syncEnabled ? 'bg-blue-500' : 'bg-white/10'}`}
-                >
-                  <motion.div
-                    animate={{ x: syncEnabled ? 26 : 2 }}
-                    className="absolute top-1 w-4 h-4 bg-white rounded-full"
-                  />
-                </button>
-              </div>
-
-              <div className="mt-6 p-4 bg-amber-500/10 rounded-xl border border-amber-500/20 flex gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-                <p className="text-xs text-amber-200/80 leading-relaxed">
-                  Cloud sync stores your questions and AI answers on Supabase. Your documents NEVER leave your device.
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleSave}
-              disabled={saving}
-              className="w-full premium-gradient py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 disabled:opacity-50"
-            >
-              {saving ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Save className="w-5 h-5" />
-                  Save Changes
-                </>
-              )}
-            </motion.button>
+        {/* Privacy & Cloud */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass p-5 rounded-3xl border border-white/5"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Cloud className="w-5 h-5 text-purple-400" />
+            <h2 className="text-lg font-bold">Cloud Sync</h2>
           </div>
+
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/10">
+            <div>
+              <h3 className="text-sm font-bold">Enable Cloud Sync</h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Sync Doubt Graph across devices</p>
+            </div>
+            <button
+              onClick={() => setSyncEnabled(!syncEnabled)}
+              className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${syncEnabled ? 'bg-indigo-500' : 'bg-white/10'}`}
+            >
+              <motion.div
+                animate={{ x: syncEnabled ? 26 : 2 }}
+                className="absolute top-[2px] w-5 h-5 bg-white rounded-full shadow-sm"
+              />
+            </button>
+          </div>
+
+          <div className="mt-4 p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20 flex gap-2">
+            <AlertCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-indigo-200/80 leading-relaxed">
+              Cloud sync stores Q&As on our servers. Your documents NEVER leave your device.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Floating Save Button */}
+        <div className="fixed bottom-6 left-0 right-0 px-4 z-40 flex justify-center pointer-events-none">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full max-w-[250px] bg-indigo-600 text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 shadow-2xl shadow-indigo-600/40 disabled:opacity-50 pointer-events-auto"
+          >
+            {saving ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                Save Changes
+              </>
+            )}
+          </motion.button>
         </div>
       </div>
     </div>

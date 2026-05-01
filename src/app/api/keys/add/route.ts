@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase-client';
 export async function POST(request: Request) {
   try {
     const { gemini_keys } = await request.json();
-    
+
     // Validate keys format
     if (!Array.isArray(gemini_keys) || gemini_keys.length === 0) {
       return NextResponse.json({ error: 'Invalid keys format' }, { status: 400 });
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     const keysJson = JSON.stringify(gemini_keys);
     const deviceId = request.headers.get('x-device-id') || 'anonymous';
-    
+
     // Encrypt using pgcrypto RPC
     const { error } = await supabase.rpc('encrypt_api_keys', {
       p_user_id: deviceId,

@@ -9,7 +9,8 @@ export async function createNewNode(
   question: string,
   doc_id: string,
   page_number: number,
-  parent_id: string | null = null
+  parent_id: string | null = null,
+  hotspot_id?: string
 ): Promise<DoubtNode | { error: string }> {
   
   let depth = 0;
@@ -43,9 +44,10 @@ export async function createNewNode(
     answer: '',
     confidence_score: 0,
     confidence_level: 'low',
-    model_used: 'gemini-2.5-flash',
+    model_used: 'gemini-2.0-flash',
     tokens_used: 0,
     depth,
+    hotspot_id,
     created_at: new Date().toISOString(),
     completed_at: null,
   };

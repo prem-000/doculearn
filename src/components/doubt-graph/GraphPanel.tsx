@@ -8,6 +8,8 @@ import { DoubtNode } from './DoubtNode';
 import { Plus, Download, History, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { useHotspotStore } from '@/lib/store';
+
 interface GraphPanelProps {
   docId: string;
   currentPage: number;
@@ -20,6 +22,8 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
   const [parentIdForNewNode, setParentIdForNewNode] = useState<string | null>(null);
   const [newQuestion, setNewQuestion] = useState('');
   const [error, setError] = useState<string | null>(null);
+  
+  const { activeHotspotId, hotspots, setActiveHotspot } = useHotspotStore();
 
   const loadNodes = useCallback(async () => {
     const fetchedNodes = await getNodesByDoc(docId);
@@ -29,6 +33,18 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
   useEffect(() => {
     loadNodes();
   }, [loadNodes]);
+
+  // Watch for hotspot changes
+  useEffect(() => {
+    if (activeHotspotId) {
+      const hotspot = hotspots.find(h => h.id === activeHotspotId);
+      if (hotspot) {
+        setNewQuestion("Explain this marked section");
+        setParentIdForNewNode(null);
+        setIsInputOpen(true);
+      }
+    }
+  }, [activeHotspotId, hotspots]);
 
   const handleToggleExpand = (nodeId: string) => {
     setExpandedNodes(prev => {
@@ -42,7 +58,14 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
   const handleAddNode = async () => {
     if (!newQuestion.trim()) return;
 
-    const result = await createNewNode(newQuestion, docId, currentPage, parentIdForNewNode);
+    // Determine target page (from hotspot if available, otherwise current page)
+    let targetPage = currentPage;
+    if (activeHotspotId) {
+      const hotspot = hotspots.find(h => h.id === activeHotspotId);
+      if (hotspot) targetPage = hotspot.page;
+    }
+
+    const result = await createNewNode(newQuestion, docId, targetPage, parentIdForNewNode, activeHotspotId || undefined);
     
     if ('error' in result) {
       setError(result.error);
@@ -53,6 +76,7 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
     setNewQuestion('');
     setIsInputOpen(false);
     setError(null);
+    setActiveHotspot(null); // Clear hotspot after adding node
 
     // Start streaming simulation
     await runExecution(result.node_id, result.question);

@@ -41,7 +41,7 @@
 - [ ] `manifest.json` icons generated (192x192, 512x512)
 - [ ] Service worker correctly caching app shell
 - [ ] Offline fallback page working
-- [ ] Installation prompt appearing on mobile/desktop
+- [ ] Installation prompt appearing on mobile
 - [ ] File handler associations verified (.pdf opens app)
 
 ### Performance (Lighthouse Targets)

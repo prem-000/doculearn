@@ -243,6 +243,31 @@
 
 ---
 
+### 7. Mobile & PWA
+
+- **[21-mobile-responsiveness.md](21-mobile-responsiveness.md)**
+  - Core principles
+  - Responsive UI components
+  - Implementation details (Tailwind/CSS)
+  - Performance for mobile
+  - Mobile-specific features
+
+- **[22-mobile-architecture.md](22-mobile-architecture.md)**
+  - PWA foundation
+  - Local data management (IndexedDB)
+  - Client-side AI processing
+  - Mobile communication flow
+  - Security & privacy for mobile
+
+- **[23-mobile-ui-design.md](23-mobile-ui-design.md)**
+  - Global layout
+  - Chat panel and upload flow
+  - Component hierarchy
+  - State structure (Zustand)
+  - Gesture handling logic (Framer Motion)
+
+---
+
 ## 📊 Document Statistics
 
 | Document | Lines | Focus Area |
@@ -267,26 +292,29 @@
 | 17-security-audit-checklist.md | ~500 | Security audit tasks |
 | 19-launch-checklist.md | ~150 | Final readiness |
 | 20-production-prd.md | ~200 | Production audit & roadmap |
-| **TOTAL** | **~7,600 lines** | **Complete PRD** |
+| 21-mobile-responsiveness.md | ~100 | Responsive design strategy |
+| 22-mobile-architecture.md | ~100 | PWA & Mobile architecture |
+| 23-mobile-ui-design.md | ~150 | Mobile-first UI design |
+| **TOTAL** | **~7,950 lines** | **Complete PRD** |
 
 ---
 
 ## 🎯 How to Use This Documentation
 
 ### For Product Managers
-Start with: `01-product-overview.md` → `02-doubt-graph-system.md` → `09-feature-specifications.md`
+Start with: `01-product-overview.md` → `02-doubt-graph-system.md` → `09-feature-specifications.md` → `21-mobile-responsiveness.md`
 
 ### For Developers
-Start with: `12-system-architecture.md` → `03-rag-pipeline.md` → `06-api-endpoints.md` → `10-build-plan.md`
+Start with: `12-system-architecture.md` → `22-mobile-architecture.md` → `03-rag-pipeline.md` → `06-api-endpoints.md`
 
 ### For Designers
-Start with: `01-product-overview.md` → `09-feature-specifications.md` → `02-doubt-graph-system.md`
+Start with: `01-product-overview.md` → `21-mobile-responsiveness.md` → `09-feature-specifications.md`
 
 ### For Security/Compliance
-Start with: `13-privacy-security.md` → `15-security-implementation.md` → `16-privacy-compliance.md` → `17-security-audit-checklist.md` → `08-data-models.md` → `07-ai-key-management.md`
+Start with: `13-privacy-security.md` → `22-mobile-architecture.md` → `15-security-implementation.md`
 
 ### For QA/Testing
-Start with: `14-success-metrics.md` → `19-launch-checklist.md` → `09-feature-specifications.md` → `11-algorithms.md`
+Start with: `14-success-metrics.md` → `19-launch-checklist.md` → `21-mobile-responsiveness.md`
 
 ---
 
@@ -294,7 +322,7 @@ Start with: `14-success-metrics.md` → `19-launch-checklist.md` → `09-feature
 
 ### Update Frequency
 - **Weekly**: Success metrics, build plan progress
-- **Monthly**: Feature specifications, roadmap
+- **Monthly**: Feature specifications, roadmap, mobile strategy
 - **Quarterly**: Architecture, algorithms (as needed)
 - **On major changes**: All affected documents
 

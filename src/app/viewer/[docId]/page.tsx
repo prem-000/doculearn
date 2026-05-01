@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getDocument } from '@/lib/db';
 import { GraphPanel } from '@/components/doubt-graph/GraphPanel';
+import { useHotspotStore } from '@/lib/store';
 import dynamic from 'next/dynamic';
 
 const PDFViewer = dynamic(() => import('@/components/pdf-viewer/PDFViewer').then(mod => mod.PDFViewer), { 
@@ -14,12 +15,15 @@ const PDFViewer = dynamic(() => import('@/components/pdf-viewer/PDFViewer').then
 export default function DocumentViewer() {
   const { docId } = useParams() as { docId: string };
   const [doc, setDoc] = useState<{ file: Blob } | null>(null);
+  const { setDocId, loadHotspots } = useHotspotStore();
 
   useEffect(() => {
     if (docId) {
+      setDocId(docId);
+      loadHotspots(docId);
       getDocument(docId).then((data) => setDoc(data as { file: Blob } | null));
     }
-  }, [docId]);
+  }, [docId, setDocId, loadHotspots]);
 
   if (!doc) return <div className="p-20 text-center">Loading document...</div>;
 

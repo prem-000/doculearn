@@ -1,86 +1,88 @@
 import Link from "next/link";
+import { BookOpen, Shield, Key } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full overflow-y-auto w-full max-w-md mx-auto relative pb-20">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 left-[-20%] w-[60%] h-[40%] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[-20%] w-[60%] h-[40%] bg-purple-500/10 blur-[100px] rounded-full pointer-events-none" />
+      
       {/* Hero Section */}
-      <main className="flex-grow flex flex-col items-center justify-center relative px-4 overflow-hidden">
-        {/* Background Decorative Elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
+      <div className="flex flex-col items-center justify-center pt-12 px-6 text-center z-10 space-y-6">
+        <div className="inline-block px-3 py-1 rounded-full glass text-xs font-semibold text-indigo-400 border border-indigo-500/20">
+          Privacy-First PDF Learning
+        </div>
         
-        <div className="max-w-4xl w-full text-center z-10 space-y-8">
-          <div className="inline-block px-4 py-1.5 mb-4 rounded-full glass text-sm font-medium text-indigo-400 border border-indigo-500/20">
-            Privacy-First Document Learning
-          </div>
-          
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight text-balance">
-            Don&apos;t just read. <br />
-            <span className="gradient-text">Understand.</span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-balance leading-relaxed">
-            Master complex documents with our tree-based Doubt Graph system. 
-            Private, local-first, and powered by advanced AI chaining.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Link 
-              href="/viewer" 
-              className="px-8 py-4 bg-foreground text-background rounded-2xl font-bold hover:scale-105 transition-all shadow-xl shadow-indigo-500/10"
-            >
-              Get Started Free
-            </Link>
-            <Link 
-              href="https://github.com" 
-              className="px-8 py-4 glass rounded-2xl font-bold hover:bg-white/5 transition-all border border-white/10"
-            >
-              View Source
-            </Link>
-          </div>
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-balance">
+          Don&apos;t just read. <br />
+          <span className="gradient-text">Understand.</span>
+        </h1>
+        
+        <p className="text-base text-muted-foreground text-balance leading-relaxed">
+          Master documents with our tree-based Doubt Graph. 
+          Private, local-first, and powered by AI.
+        </p>
+        
+        <div className="flex flex-col w-full gap-3 pt-4">
+          <Link 
+            href="/viewer" 
+            className="w-full py-4 bg-foreground text-background rounded-2xl font-bold active:scale-95 transition-all shadow-xl shadow-indigo-500/10 text-lg flex items-center justify-center gap-2"
+          >
+            <BookOpen className="w-5 h-5" />
+            Open Document
+          </Link>
+          <Link 
+            href="https://github.com" 
+            className="w-full py-4 glass rounded-2xl font-bold active:scale-95 transition-all border border-white/10 text-lg"
+          >
+            View Source
+          </Link>
         </div>
+      </div>
 
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mt-32 px-4 pb-20">
-          <FeatureCard 
-            title="Doubt Graph" 
-            description="Visualize your learning journey with a non-linear tree of questions and answers."
-            icon="🌿"
-          />
-          <FeatureCard 
-            title="Local-First Privacy" 
-            description="Your documents never leave your browser. All parsing and embedding happens locally."
-            icon="🔒"
-          />
-          <FeatureCard 
-            title="AI Chaining" 
-            description="Automatic rotation between Gemini keys with seamless fallback to local Ollama models."
-            icon="⛓️"
-          />
-        </div>
-      </main>
+      {/* Feature List */}
+      <div className="flex flex-col gap-4 mt-12 px-6 z-10">
+        <FeatureCard 
+          title="Doubt Graph" 
+          description="Visualize your learning journey with a non-linear tree of Q&As."
+          icon={<BookOpen className="w-6 h-6 text-indigo-400" />}
+        />
+        <FeatureCard 
+          title="Local-First Privacy" 
+          description="Documents never leave your device. Parsing happens locally."
+          icon={<Shield className="w-6 h-6 text-emerald-400" />}
+        />
+        <FeatureCard 
+          title="Bring Your Key" 
+          description="Use your own Gemini keys directly from your device."
+          icon={<Key className="w-6 h-6 text-amber-400" />}
+        />
+      </div>
 
-      <footer className="py-10 border-t border-white/5 flex flex-col items-center gap-4 text-sm text-muted-foreground">
-        <p>© 2024 DocuLearn AI. Open source and privacy-focused.</p>
-        <div className="flex gap-8">
-          <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-          <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
-          <Link href="/docs" className="hover:text-foreground transition-colors">Documentation</Link>
+      <footer className="mt-auto pt-12 pb-6 flex flex-col items-center gap-2 text-xs text-muted-foreground">
+        <p>© 2024 DocuLearn AI. Open source.</p>
+        <div className="flex gap-4 mt-2">
+          <Link href="/privacy" className="underline underline-offset-2">Privacy</Link>
+          <Link href="/terms" className="underline underline-offset-2">Terms</Link>
         </div>
       </footer>
     </div>
   );
 }
 
-function FeatureCard({ title, description, icon }: { title: string, description: string, icon: string }) {
+function FeatureCard({ title, description, icon }: { title: string, description: string, icon: React.ReactNode }) {
   return (
-    <div className="p-8 rounded-3xl glass border border-white/5 hover:border-indigo-500/20 transition-all group">
-      <div className="text-4xl mb-6 group-hover:scale-110 transition-transform origin-left">{icon}</div>
-      <h3 className="text-xl font-bold mb-3">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">
-        {description}
-      </p>
+    <div className="p-5 rounded-2xl glass border border-white/5 flex gap-4 items-start active:bg-white/5 transition-colors">
+      <div className="p-3 rounded-xl bg-white/5 mt-1 border border-white/5">
+        {icon}
+      </div>
+      <div>
+        <h3 className="text-base font-bold mb-1">{title}</h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {description}
+        </p>
+      </div>
     </div>
   );
 }
-
