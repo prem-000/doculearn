@@ -6,8 +6,7 @@ export function PWARegister() {
   useEffect(() => {
     if (
       typeof window !== 'undefined' &&
-      'serviceWorker' in navigator &&
-      (window as any).serviceWorkerRegistration === undefined
+      'serviceWorker' in navigator
     ) {
       navigator.serviceWorker
         .register('/sw.js')

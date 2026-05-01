@@ -13,8 +13,8 @@ const PDFViewer = dynamic(() => import('@/components/pdf-viewer/PDFViewer').then
 
 export default function DocumentViewer() {
   const { docId } = useParams() as { docId: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [doc, setDoc] = useState<any>(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (docId) {
@@ -33,7 +33,7 @@ export default function DocumentViewer() {
 
       {/* Right: Doubt Graph Panel */}
       <div className="w-[500px] flex-shrink-0 bg-slate-50 dark:bg-slate-900/30">
-        <GraphPanel docId={docId} currentPage={currentPage} />
+        <GraphPanel docId={docId} currentPage={1} />
       </div>
     </div>
   );

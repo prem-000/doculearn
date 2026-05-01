@@ -2,11 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
-
 export function usePWAInstall() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -16,7 +11,7 @@ export function usePWAInstall() {
   useEffect(() => {
     // 1. Check if browser supports PWA installation
     const supportsInstall = typeof window !== 'undefined' && 
-      ('beforeinstallprompt' in window || (window.navigator as any).standalone !== undefined);
+      ('beforeinstallprompt' in window || navigator.standalone !== undefined);
     setIsSupported(supportsInstall);
 
     // 2. Check if already installed
@@ -24,7 +19,7 @@ export function usePWAInstall() {
       if (typeof window === 'undefined') return false;
       
       // For iOS
-      if ((window.navigator as any).standalone) return true;
+      if (navigator.standalone) return true;
       
       // For others
       if (window.matchMedia('(display-mode: standalone)').matches) return true;
@@ -35,8 +30,8 @@ export function usePWAInstall() {
     setIsInstalled(checkIsInstalled());
 
     // 3. Check if prompt was already captured by the global script
-    if ((window as any).deferredPrompt) {
-      setInstallPrompt((window as any).deferredPrompt);
+    if (window.deferredPrompt) {
+      setInstallPrompt(window.deferredPrompt);
       setCanInstall(true);
     }
 
@@ -48,7 +43,8 @@ export function usePWAInstall() {
       setCanInstall(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    window.addEventListener('beforeinstallprompt' as any, handler as any);
 
     // 5. Listen for appinstalled event
     const installedHandler = () => {
@@ -59,7 +55,8 @@ export function usePWAInstall() {
     window.addEventListener('appinstalled', installedHandler);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    window.removeEventListener('beforeinstallprompt' as any, handler as any);
       window.removeEventListener('appinstalled', installedHandler);
     };
   }, []);

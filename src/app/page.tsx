@@ -15,7 +15,7 @@ export default function Home() {
           </div>
           
           <h1 className="text-6xl md:text-8xl font-bold tracking-tight text-balance">
-            Don't just read. <br />
+            Don&apos;t just read. <br />
             <span className="gradient-text">Understand.</span>
           </h1>
           

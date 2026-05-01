@@ -5,8 +5,8 @@ import { DoubtNode as DoubtNodeType } from '@/types/doubt-graph';
 import { getNodesByDoc, saveNode } from '@/lib/db';
 import { createNewNode, executeAINode, calculateConfidence } from '@/lib/doubt-graph-engine';
 import { DoubtNode } from './DoubtNode';
-import { Plus, Trash2, Download, History, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Download, History, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface GraphPanelProps {
   docId: string;
@@ -92,10 +92,11 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
         return updatedNodes;
       });
 
-    } catch (err: any) {
-      console.error('AI Execution failed:', err);
-      setError(err.message || "AI failed to respond");
-      setNodes(prev => prev.map(n => n.node_id === nodeId ? { ...n, status: 'error', answer: 'Error: ' + err.message } : n));
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('AI Execution failed:', error);
+      setError(error.message || "AI failed to respond");
+      setNodes(prev => prev.map(n => n.node_id === nodeId ? { ...n, status: 'error', answer: 'Error: ' + error.message } : n));
     }
   };
 

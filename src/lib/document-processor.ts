@@ -5,6 +5,15 @@ export interface DocumentChunk {
   section_title?: string;
 }
 
+interface TextItem {
+  str: string;
+  dir: string;
+  width: number;
+  height: number;
+  transform: number[];
+  fontName: string;
+}
+
 export async function parsePDF(file: File): Promise<string[]> {
   const pdfjsLib = await import('pdfjs-dist');
   pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -19,7 +28,7 @@ export async function parsePDF(file: File): Promise<string[]> {
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
     const pageText = textContent.items
-      .map((item: any) => (item as { str: string }).str)
+      .map((item) => (item as unknown as TextItem).str)
       .join(' ');
     pages.push(pageText);
   }

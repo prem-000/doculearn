@@ -18,7 +18,7 @@ interface DoubtNodeProps {
   isExpanded: boolean;
 }
 
-const statusConfig: Record<NodeStatus, { icon: any; color: string }> = {
+const statusConfig: Record<NodeStatus, { icon: React.ElementType; color: string }> = {
   pending: { icon: CircleDashed, color: 'text-gray-400' },
   streaming: { icon: CircleDashed, color: 'text-blue-500 animate-spin' },
   done: { icon: CheckCircle2, color: 'text-green-500' },

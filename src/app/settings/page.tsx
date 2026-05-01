@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, Shield, Cpu, Cloud, Save, Check, AlertCircle } from 'lucide-react';
+import { Settings, Shield, Cpu, Cloud, Save, AlertCircle } from 'lucide-react';
 import { getDeviceId } from '@/lib/device-id';
 import { supabase } from '@/lib/supabase-client';
 import toast from 'react-hot-toast';
@@ -19,7 +19,7 @@ export default function SettingsPage() {
     async function loadSettings() {
       try {
         const deviceId = getDeviceId();
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('user_settings')
           .select('*')
           .eq('user_id', deviceId)
@@ -75,8 +75,9 @@ export default function SettingsPage() {
       
       toast.success('Settings saved successfully');
       setGeminiKeys(''); // Clear the input after saving
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to save settings');
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }

@@ -4,6 +4,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { callOllama } from '@/lib/ollama';
 import { supabaseAdmin } from '@/lib/supabase';
 
+interface ChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { prompt, deviceId, systemPrompt, history = [] } = await req.json();
@@ -75,7 +80,7 @@ export async function POST(req: NextRequest) {
 
         // Use startChat to support history if provided
         const chat = model.startChat({
-          history: history.map((msg: any) => ({
+          history: history.map((msg: ChatMessage) => ({
             role: msg.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: msg.content }]
           })),
