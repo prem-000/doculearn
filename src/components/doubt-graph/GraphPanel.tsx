@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DoubtNode as DoubtNodeType } from '@/types/doubt-graph';
 import { getNodesByDoc, saveNode } from '@/lib/db';
 import { createNewNode, executeAINode, calculateConfidence } from '@/lib/doubt-graph-engine';
@@ -21,14 +21,14 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
   const [newQuestion, setNewQuestion] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadNodes();
-  }, [docId]);
-
-  const loadNodes = async () => {
+  const loadNodes = useCallback(async () => {
     const fetchedNodes = await getNodesByDoc(docId);
     setNodes(fetchedNodes.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
-  };
+  }, [docId]);
+
+  useEffect(() => {
+    loadNodes();
+  }, [loadNodes]);
 
   const handleToggleExpand = (nodeId: string) => {
     setExpandedNodes(prev => {

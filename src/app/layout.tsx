@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -15,16 +14,21 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+import type { Metadata, Viewport } from "next";
+
 export const metadata: Metadata = {
   title: "DocuLearn AI | Don't just read. Understand.",
   description: "Privacy-first, AI-powered document learning platform with non-linear Doubt Graphs.",
   manifest: "/manifest.json",
-  themeColor: "#6366f1",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "DocuLearn",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
 };
 
 import { DeviceProvider } from "@/components/providers/device-provider";

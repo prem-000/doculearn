@@ -98,8 +98,9 @@ export async function POST(req: NextRequest) {
           key_index: key.index
         });
 
-      } catch (err: any) {
-        const status = err?.status || 500;
+      } catch (err: unknown) {
+        const error = err as { status?: number; message?: string };
+        const status = error?.status || 500;
 
         if (status === 429) {
           await rotator.setCooldown(key.index, 60);
@@ -114,14 +115,15 @@ export async function POST(req: NextRequest) {
         }
 
         console.error('Gemini API Error:', err);
-        return NextResponse.json({ error: 'GEMINI_API_ERROR', details: err.message }, { status: 500 });
+        return NextResponse.json({ error: 'GEMINI_API_ERROR', details: error.message || 'Unknown error' }, { status: 500 });
       }
     }
 
     return NextResponse.json({ error: 'ALL_KEYS_FAILED' }, { status: 500 });
 
-  } catch (error: any) {
-    console.error('Chat API Error:', error);
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Chat API Error:', err);
     return NextResponse.json({ error: 'INTERNAL_SERVER_ERROR' }, { status: 500 });
   }
 }

@@ -13,12 +13,11 @@ const PDFViewer = dynamic(() => import('@/components/pdf-viewer/PDFViewer').then
 
 export default function DocumentViewer() {
   const { docId } = useParams() as { docId: string };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [doc, setDoc] = useState<any>(null);
+  const [doc, setDoc] = useState<{ file: Blob } | null>(null);
 
   useEffect(() => {
     if (docId) {
-      getDocument(docId).then(setDoc);
+      getDocument(docId).then((data) => setDoc(data as { file: Blob } | null));
     }
   }, [docId]);
 
