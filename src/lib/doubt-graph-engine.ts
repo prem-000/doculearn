@@ -59,6 +59,8 @@ export async function createNewNode(
 import { getChunksByPageRange } from './db';
 
 // Real AI execution with streaming
+import { useHotspotStore } from './store';
+
 export async function* executeAINode(node_id: string, question: string, doc_id: string) {
   // 1. Get Node to find its page number
   const node = await getNode(node_id);
@@ -67,12 +69,19 @@ export async function* executeAINode(node_id: string, question: string, doc_id: 
   // 2. Retrieve context (Positional Strategy: N-1, N, N+1)
   const chunks = await getChunksByPageRange(doc_id, node.page_number);
   
-  // Also include semantic search results if positional isn't enough? 
-  // User asked for "based on the N+1, N, N-1 pages", so we strictly use those.
-  const context = chunks
+  let context = chunks
     .sort((a, b) => a.page_number - b.page_number)
     .map(c => `[Page ${c.page_number}]: ${c.text}`)
     .join('\n\n');
+    
+  // Inject hotspot text if present
+  if (node.hotspot_id) {
+    const hotspots = useHotspotStore.getState().hotspots;
+    const hotspot = hotspots.find(h => h.id === node.hotspot_id);
+    if (hotspot && hotspot.text) {
+      context += `\n\n[USER SELECTED TEXT FROM PAGE ${hotspot.page}]:\n"${hotspot.text}"\n`;
+    }
+  }
   
   // 3. Prepare prompt
   const systemPrompt = `You are a strict Document Analysis AI. 
@@ -82,10 +91,9 @@ Your goal is to answer questions EXCLUSIVELY based on the provided PDF context b
 CRITICAL RULES:
 1. DO NOT ask the user to paste their content or provide the file. YOU ALREADY HAVE IT.
 2. Only use the provided context (Pages ${node.page_number-1} to ${node.page_number+1}).
-3. If the answer is NOT present in the provided context, you MUST say: "I'm sorry, but I cannot find the answer to this question within the specific pages of the document (Pages ${node.page_number-1}-${node.page_number+1})."
-4. Do NOT use outside knowledge or assume things not in the text.
-5. Analyze the text deeply to find subtle connections.
-6. If the context is empty, state that no text was found on these pages.
+3. If the user refers to "selected text", "marked section", or "highlighted info", refer to the [USER SELECTED TEXT] provided in the context below.
+4. If the answer is NOT present in the provided context, you MUST say: "I'm sorry, but I cannot find the answer to this question within the specific pages of the document (Pages ${node.page_number-1}-${node.page_number+1})."
+5. Do NOT use outside knowledge or assume things not in the text.
 
 Context from PDF:
 ${context}`;

@@ -13,9 +13,10 @@ import { useHotspotStore } from '@/lib/store';
 interface GraphPanelProps {
   docId: string;
   currentPage: number;
+  onClose?: () => void;
 }
 
-export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) => {
+export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage, onClose }) => {
   const [nodes, setNodes] = useState<DoubtNodeType[]>([]);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [isInputOpen, setIsInputOpen] = useState(false);
@@ -39,7 +40,7 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
     if (activeHotspotId) {
       const hotspot = hotspots.find(h => h.id === activeHotspotId);
       if (hotspot) {
-        setNewQuestion("Explain this marked section");
+        setNewQuestion(hotspot.question || "Explain this marked section");
         setParentIdForNewNode(null);
         setIsInputOpen(true);
       }
@@ -157,12 +158,17 @@ export const GraphPanel: React.FC<GraphPanelProps> = ({ docId, currentPage }) =>
           <h2 className="text-lg font-bold tracking-tight">Doubt Graph</h2>
         </div>
         <div className="flex gap-2">
-          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all">
+          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all cursor-pointer">
             <Download className="w-5 h-5" />
           </button>
-          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all">
+          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all cursor-pointer">
             <History className="w-5 h-5" />
           </button>
+          {onClose && (
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 text-slate-500 transition-all" title="Close Panel">
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
