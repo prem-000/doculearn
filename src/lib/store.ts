@@ -47,18 +47,19 @@ export const useHotspotStore = create<HotspotState>((set, get) => ({
 
   loadHotspots: async (docId) => {
     const hotspots = await getHotspotsByDoc(docId);
-    set({ hotspots: hotspots.map(h => ({ ...h, createdAt: h.created_at })) as any });
+    set({ hotspots: hotspots.map(h => ({ ...h, createdAt: h.created_at })) as unknown as Hotspot[] });
   },
 
   addHotspot: (hotspot) => {
     set((state) => ({ 
       hotspots: [...state.hotspots, hotspot] 
     }));
+    const { createdAt, ...rest } = hotspot;
     saveHotspot({
-      ...hotspot,
-      created_at: hotspot.createdAt,
+      ...rest,
+      created_at: createdAt,
       pdf_id: get().docId || ''
-    } as any);
+    });
   },
   
   removeHotspot: (id) => {

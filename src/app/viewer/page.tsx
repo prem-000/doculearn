@@ -6,7 +6,6 @@ import { Upload, FileText, Brain, Lock, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
-import { cn } from '@/lib/utils';
 import { parsePDF, chunkText } from '@/lib/document-processor';
 import { saveDocument, saveChunks } from '@/lib/db';
 

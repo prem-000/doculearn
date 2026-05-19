@@ -16,6 +16,9 @@ export function PDFPage({ page, pageNumber, scale = 1.5 }: PDFPageProps) {
   const [isRendered, setIsRendered] = useState(false);
 
   useEffect(() => {
+    let renderTask: any = null;
+    let isActive = true;
+
     const renderPage = async () => {
       const viewport = page.getViewport({ scale });
       const canvas = canvasRef.current;
@@ -34,11 +37,29 @@ export function PDFPage({ page, pageNumber, scale = 1.5 }: PDFPageProps) {
         canvas: canvas,
       };
 
-      await page.render(renderContext).promise;
-      setIsRendered(true);
+      try {
+        renderTask = page.render(renderContext);
+        await renderTask.promise;
+        if (isActive) {
+          setIsRendered(true);
+        }
+      } catch (error: any) {
+        if (error?.name === 'RenderingCancelledException') {
+          // Expected when component unmounts or re-renders
+        } else {
+          console.error('Error rendering page:', error);
+        }
+      }
     };
 
     renderPage();
+
+    return () => {
+      isActive = false;
+      if (renderTask) {
+        renderTask.cancel();
+      }
+    };
   }, [page, scale]);
 
   return (
