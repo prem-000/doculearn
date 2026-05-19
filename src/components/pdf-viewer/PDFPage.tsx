@@ -25,7 +25,7 @@ export function PDFPage({ page, pageNumber, scale = 1.5 }: PDFPageProps) {
 
   // 1. Render Canvas
   useEffect(() => {
-    let renderTask: any = null;
+    let renderTask: pdfjsLib.RenderTask | null = null;
     let isActive = true;
 
     const renderPage = async () => {
@@ -52,8 +52,8 @@ export function PDFPage({ page, pageNumber, scale = 1.5 }: PDFPageProps) {
         if (isActive) {
           setIsRendered(true);
         }
-      } catch (error: any) {
-        if (error?.name !== 'RenderingCancelledException') {
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name !== 'RenderingCancelledException') {
           console.error('Error rendering page:', error);
         }
       }
@@ -141,7 +141,7 @@ export function PDFPage({ page, pageNumber, scale = 1.5 }: PDFPageProps) {
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
   }, []);
 
-  const { addHotspot, setActiveHotspot, setChatOpen, docId, hotspots, removeHotspot, mode } = useHotspotStore();
+  const { addHotspot, setActiveHotspot, setChatOpen, docId, hotspots, mode } = useHotspotStore();
 
   const handleContextAction = (action: string) => {
     if (!docId || !selectionRect) return;
@@ -190,7 +190,7 @@ export function PDFPage({ page, pageNumber, scale = 1.5 }: PDFPageProps) {
       <div 
         ref={textLayerRef}
         className="absolute inset-0 z-10 textLayer"
-        style={{ "--scale-factor": scale } as any}
+        style={{ "--scale-factor": scale } as React.CSSProperties}
         onClick={(e) => {
           if (!docId) return;
           const rect = textLayerRef.current?.getBoundingClientRect();

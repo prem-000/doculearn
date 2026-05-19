@@ -6,7 +6,6 @@ import { getDocument } from '@/lib/db';
 import { GraphPanel } from '@/components/doubt-graph/GraphPanel';
 import { useHotspotStore } from '@/lib/store';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import { MessageCircle } from 'lucide-react';
 
